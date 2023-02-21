@@ -17,6 +17,14 @@ mongoose
     console.log("Connected to the DB!");
   });
 
+//import routes
+const userRoutes = require("./routes/user");
+app.use(userRoutes);
+
+app.all("*", (req, res) => {
+  res.status(404).json(err("This route doesn't exist"));
+});
+
 const defaultPort = 3000;
 const PORT = process.env.PORT;
 
