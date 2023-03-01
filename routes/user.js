@@ -16,7 +16,7 @@ router.post("/user/signup", async (req, res) => {
     if (user) {
       res.status(409).json(err("This email has already an account"));
     } else {
-      if (email && username && lastname && firstname && password) {
+      if (email && lastname && firstname && password) {
         const token = uid2(120);
         const salt = uid2(120);
         const hash = SHA256(password + salt).toString(encBase64);
@@ -25,7 +25,6 @@ router.post("/user/signup", async (req, res) => {
         const newUser = new User({
           email: email,
           account: {
-            username: username,
             lastname: lastname,
             firstname: firstname,
           },
@@ -41,7 +40,6 @@ router.post("/user/signup", async (req, res) => {
           success({
             _id: newUser._id,
             email: newUser.email,
-            username: newUser.account.username,
             lastname: newUser.account.lastname,
             firstname: newUser.account.firstname,
             token: newUser.token,
@@ -70,7 +68,6 @@ router.post("/user/login", async (req, res) => {
             success({
               _id: user._id,
               email: user.email,
-              username: user.account.username,
               lastname: user.account.lastname,
               firstname: user.account.firstname,
               token: user.token,

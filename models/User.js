@@ -7,10 +7,6 @@ const User = mongoose.model("Users", {
     type: String,
   },
   account: {
-    username: {
-      required: true,
-      type: String,
-    },
     lastname: String,
     firstname: String,
     picture: Object,
