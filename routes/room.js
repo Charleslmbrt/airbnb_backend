@@ -199,4 +199,40 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+// Delete room
+router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.id);
+
+    if (room) {
+      const userId = req.user._id;
+      const roomUserId = room.owner;
+
+      if (String(userId) === String(roomUserId)) {
+        await Room.findByIdAndRemove(req.params.id);
+
+        const user = await User.findById(userId);
+        // on recherche l'utilisateur en BDD
+
+        let tab = user.rooms;
+        let num = tab.indexOf(req.params.id);
+        tab.splice(num, 1);
+        // on supprime du tableau "rooms" l'id de l'annonce qui vient d'être supprimée en BDD
+        await User.findByIdAndUpdate(userId, {
+          rooms: tab,
+        });
+        // on modifie "rooms" en BDD : l'annonce supprimée n'apparaitra plus dans le tableau des annonces de l'utilisateur
+
+        res.status(200).json(success("Room deleted"));
+      } else {
+        res.status(400).json(err("Unauthorized"));
+      }
+    } else {
+      res.status(400).json(err("Room not found"));
+    }
+  } catch (error) {
+    res.status(400).json(err(error.message));
+  }
+});
+
 module.exports = router;
