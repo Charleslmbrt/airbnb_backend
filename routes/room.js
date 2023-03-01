@@ -9,6 +9,7 @@ const Room = require("../models/Room");
 // import middlewares
 const isAuthenticated = require("../middlewares/isAuthenticated");
 
+// Create room
 router.post("/room/publish", isAuthenticated, async (req, res) => {
   try {
     const {
@@ -75,6 +76,7 @@ router.post("/room/publish", isAuthenticated, async (req, res) => {
   }
 });
 
+// Get rooms
 router.get("/rooms", async (req, res) => {
   try {
     const rooms = await Room.find({}).populate({
@@ -82,6 +84,116 @@ router.get("/rooms", async (req, res) => {
       select: "account",
     });
     res.json(success(rooms));
+  } catch (error) {
+    res.status(400).json(err(error.message));
+  }
+});
+
+// Get one room
+router.get("/room/:id", async (req, res) => {
+  if (req.params.id) {
+    try {
+      const room = await Room.findById(req.params.id).populate({
+        path: "owner",
+        select: "account",
+      });
+
+      if (room) {
+        res.json(success(room));
+      } else {
+        res.status(400).json(err("Room not found"));
+      }
+    } catch (error) {
+      res.status(400).json(err(error.message));
+    }
+  } else {
+    res.status(400).json(err("Missing room id"));
+  }
+});
+
+// Update room
+router.put("/room/update/:id", isAuthenticated, async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      price,
+      type,
+      travelers,
+      rooms,
+      beds,
+      bathrooms,
+      pictures,
+      location,
+      options,
+    } = req.body;
+
+    const room = await Room.findById(req.params.id);
+
+    if (room) {
+      const userId = req.user._id;
+      const roomUserId = room.owner;
+
+      if (String(userId) === String(roomUserId)) {
+        if (
+          title ||
+          description ||
+          price ||
+          type ||
+          travelers ||
+          rooms ||
+          beds ||
+          bathrooms ||
+          location ||
+          options
+        ) {
+          const newObj = {};
+
+          if (title) {
+            newObj.title = title;
+          }
+          if (description) {
+            newObj.description = description;
+          }
+          if (price) {
+            newObj.price = price;
+          }
+          if (type) {
+            newObj.type = type;
+          }
+          if (travelers) {
+            newObj.travelers = travelers;
+          }
+          if (rooms) {
+            newObj.rooms = rooms;
+          }
+          if (beds) {
+            newObj.beds = beds;
+          }
+          if (bathrooms) {
+            newObj.rooms = rooms;
+          }
+          if (location) {
+            newObj.location = [location.lat, location.lng];
+          }
+          if (options) {
+            newObj.options = options;
+          }
+
+          await Room.findByIdAndUpdate(req.params.id, newObj);
+
+          const roomUpdated = await Room.findById(req.params.id);
+
+          res.json(success(roomUpdated));
+        } else {
+          res.status(400).json(err("Missing parameters"));
+        }
+      } else {
+        res.status(401).json(err("Unauthorized"));
+      }
+    } else {
+      res.status(400).json(err("Room not found"));
+    }
   } catch (error) {
     res.status(400).json(err(error.message));
   }

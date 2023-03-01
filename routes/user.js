@@ -10,7 +10,7 @@ const User = require("../models/User");
 
 router.post("/user/signup", async (req, res) => {
   try {
-    const { email, username, lastname, firstname, password } = req.body;
+    const { email, lastname, firstname, password } = req.body;
     const user = await User.findOne({ email: email });
 
     if (user) {
