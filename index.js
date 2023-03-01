@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const { success, err } = require("./status");
 const morgan = require("morgan");
 require("dotenv").config();
 const cors = require("cors");
@@ -12,7 +13,7 @@ app.use(cors());
 
 mongoose
   .set("strictQuery", false)
-  .connect("mongodb://localhost/airbnb")
+  .connect("mongodb://localhost/airbnb", { useNewUrlParser: true })
   .then(() => {
     console.log("Connected to the DB!");
   });
@@ -20,6 +21,8 @@ mongoose
 //import routes
 const userRoutes = require("./routes/user");
 app.use(userRoutes);
+const roomRoutes = require("./routes/room");
+app.use(roomRoutes);
 
 app.all("*", (req, res) => {
   res.status(404).json(err("This route doesn't exist"));

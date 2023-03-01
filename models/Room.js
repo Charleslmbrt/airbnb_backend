@@ -1,11 +1,18 @@
 const mongoose = require("mongoose");
 
-const Room = mongoose.model("Rooms", {
+const Room = mongoose.model("Room", {
   title: String,
   description: String,
   price: Number,
   ratingValue: Number,
   reviews: Number,
+  type: String,
+  mainInfos: {
+    travelers: Number,
+    rooms: Number,
+    beds: Number,
+    bathrooms: Number,
+  },
   pictures: { type: Array, default: [] },
   location: { type: Array, default: [] },
   options: { type: Array, default: [] },

@@ -9,7 +9,7 @@ const Room = require("../models/Room");
 // import middlewares
 const isAuthenticated = require("../middlewares/isAuthenticated");
 
-router.post("room/publish", isAuthenticated, async (req, res) => {
+router.post("/room/publish", isAuthenticated, async (req, res) => {
   try {
     const {
       title,
@@ -17,22 +17,45 @@ router.post("room/publish", isAuthenticated, async (req, res) => {
       price,
       ratingValue,
       reviews,
+      type,
+      travelers,
+      rooms,
+      beds,
+      bathrooms,
       pictures,
       location,
       options,
     } = req.body;
 
-    if (title && description && price && pictures && location && options) {
+    if (
+      title &&
+      description &&
+      price &&
+      type &&
+      travelers &&
+      rooms &&
+      beds &&
+      bathrooms
+    ) {
       // Create array for location data
       const locationTab = [location.lat, location.lng];
       const newRoom = new Room({
         title: title,
         description: description,
         price: price,
+        ratingValue: ratingValue,
+        reviews: reviews,
+        type: type,
+        mainInfos: {
+          travelers: travelers,
+          rooms: rooms,
+          beds: beds,
+          bathrooms: bathrooms,
+        },
         pictures: pictures,
         location: locationTab,
-        option: options,
-        owner: req.user,
+        options: options,
+        owner: req.user._id,
       });
 
       await newRoom.save();
@@ -47,6 +70,18 @@ router.post("room/publish", isAuthenticated, async (req, res) => {
     } else {
       res.status(400).json(err("Parameters missing"));
     }
+  } catch (error) {
+    res.status(400).json(err(error.message));
+  }
+});
+
+router.get("/rooms", async (req, res) => {
+  try {
+    const rooms = await Room.find({}).populate({
+      path: "owner",
+      select: "account",
+    });
+    res.json(success(rooms));
   } catch (error) {
     res.status(400).json(err(error.message));
   }
