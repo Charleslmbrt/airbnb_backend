@@ -1,6 +1,8 @@
 const express = require("express");
 const { success, err } = require("../status");
 const router = express.Router();
+const fileUpload = require("express-fileupload");
+const cloudinary = require("cloudinary").v2;
 
 // import models
 const User = require("../models/User");
@@ -9,6 +11,30 @@ const Room = require("../models/Room");
 // import middlewares
 const isAuthenticated = require("../middlewares/isAuthenticated");
 
+// account Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME_CLOUDINARY,
+  api_key: process.env.API_KEY_CLOUDINARY,
+  api_secret: process.env.API_SECRET_CLOUDINARY,
+});
+
+// Convert buffer as base64 format
+const convertToBase64 = (file) => {
+  return `data:${file.mimetype};base64,${file.data.toString("base64")}`;
+};
+
+// Upload file
+router.post("/upload", fileUpload(), async (req, res) => {
+  try {
+    const imgConvert = convertToBase64(req.files.picture);
+    const result = await cloudinary.uploader.upload(imgConvert);
+    console.log(result);
+    res.json(success("UPLOAD OK"));
+  } catch (error) {
+    res.status(400).json(err(error.message));
+  }
+});
+
 // Create room
 router.post("/room/publish", isAuthenticated, async (req, res) => {
   try {
@@ -16,6 +42,8 @@ router.post("/room/publish", isAuthenticated, async (req, res) => {
       title,
       description,
       price,
+      city,
+      country,
       ratingValue,
       reviews,
       type,
@@ -32,6 +60,8 @@ router.post("/room/publish", isAuthenticated, async (req, res) => {
       title &&
       description &&
       price &&
+      city &&
+      country &&
       type &&
       travelers &&
       rooms &&
@@ -44,6 +74,8 @@ router.post("/room/publish", isAuthenticated, async (req, res) => {
         title: title,
         description: description,
         price: price,
+        city: city,
+        country: country,
         ratingValue: ratingValue,
         reviews: reviews,
         type: type,
@@ -118,6 +150,8 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
       title,
       description,
       price,
+      city,
+      country,
       type,
       travelers,
       rooms,
@@ -139,6 +173,8 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
           title ||
           description ||
           price ||
+          city ||
+          country ||
           type ||
           travelers ||
           rooms ||
@@ -157,6 +193,12 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
           }
           if (price) {
             newObj.price = price;
+          }
+          if (city) {
+            newObj.city = city;
+          }
+          if (country) {
+            newObj.country = country;
           }
           if (type) {
             newObj.type = type;
