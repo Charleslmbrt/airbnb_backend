@@ -10,8 +10,8 @@ const Room = mongoose.model("Room", {
   reviews: Number,
   type: String,
   mainInfos: {
-    travelers: Number,
-    rooms: Number,
+    guests: Number,
+    bedrooms: Number,
     beds: Number,
     bathrooms: Number,
   },

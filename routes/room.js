@@ -47,8 +47,8 @@ router.post("/room/publish", isAuthenticated, async (req, res) => {
       ratingValue,
       reviews,
       type,
-      travelers,
-      rooms,
+      guests,
+      bedrooms,
       beds,
       bathrooms,
       pictures,
@@ -63,8 +63,8 @@ router.post("/room/publish", isAuthenticated, async (req, res) => {
       city &&
       country &&
       type &&
-      travelers &&
-      rooms &&
+      guests &&
+      bedrooms &&
       beds &&
       bathrooms
     ) {
@@ -80,8 +80,8 @@ router.post("/room/publish", isAuthenticated, async (req, res) => {
         reviews: reviews,
         type: type,
         mainInfos: {
-          travelers: travelers,
-          rooms: rooms,
+          guests: guests,
+          bedrooms: bedrooms,
           beds: beds,
           bathrooms: bathrooms,
         },
@@ -153,8 +153,8 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
       city,
       country,
       type,
-      travelers,
-      rooms,
+      guests,
+      bedrooms,
       beds,
       bathrooms,
       pictures,
@@ -176,8 +176,8 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
           city ||
           country ||
           type ||
-          travelers ||
-          rooms ||
+          guests ||
+          bedrooms ||
           beds ||
           bathrooms ||
           location ||
@@ -203,11 +203,11 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
           if (type) {
             newObj.type = type;
           }
-          if (travelers) {
-            newObj.travelers = travelers;
+          if (guests) {
+            newObj.guests = guests;
           }
-          if (rooms) {
-            newObj.rooms = rooms;
+          if (bedrooms) {
+            newObj.bedrooms = bedrooms;
           }
           if (beds) {
             newObj.beds = beds;
