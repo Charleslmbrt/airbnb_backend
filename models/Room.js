@@ -15,9 +15,11 @@ const Room = mongoose.model("Room", {
     beds: Number,
     bathrooms: Number,
   },
-  pictures: { type: Array, default: [] },
-  location: { type: Array, default: [] },
-  options: { type: Array, default: [] },
+  picture: { type: mongoose.Schema.Types.Mixed, default: {} },
+  picturesArray: { type: Array, default: [] },
+  location: { type: [Number], default: [] },
+
+  options: String,
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

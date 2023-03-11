@@ -36,77 +36,117 @@ router.post("/upload", fileUpload(), async (req, res) => {
 });
 
 // Create room
-router.post("/room/publish", isAuthenticated, async (req, res) => {
-  try {
-    const {
-      title,
-      description,
-      price,
-      city,
-      country,
-      ratingValue,
-      reviews,
-      type,
-      guests,
-      bedrooms,
-      beds,
-      bathrooms,
-      pictures,
-      location,
-      options,
-    } = req.body;
+router.post(
+  "/room/publish",
+  isAuthenticated,
+  fileUpload(),
+  async (req, res) => {
+    try {
+      console.log("req.files:", req.files);
+      const {
+        title,
+        description,
+        price,
+        city,
+        country,
+        ratingValue,
+        reviews,
+        type,
+        guests,
+        bedrooms,
+        beds,
+        bathrooms,
+        location,
+        options,
+      } = req.body;
 
-    if (
-      title &&
-      description &&
-      price &&
-      city &&
-      country &&
-      type &&
-      guests &&
-      bedrooms &&
-      beds &&
-      bathrooms
-    ) {
-      // Create array for location data
-      const locationTab = [location.lat, location.lng];
-      const newRoom = new Room({
-        title: title,
-        description: description,
-        price: price,
-        city: city,
-        country: country,
-        ratingValue: ratingValue,
-        reviews: reviews,
-        type: type,
-        mainInfos: {
-          guests: guests,
-          bedrooms: bedrooms,
-          beds: beds,
-          bathrooms: bathrooms,
-        },
-        pictures: pictures,
-        location: locationTab,
-        options: options,
-        owner: req.user._id,
-      });
+      if (title) {
+        // const imgConvert = convertToBase64(req.files.pictures);
+        // const result = await cloudinary.uploader.upload(imgConvert);
+        // console.log(result);
 
-      await newRoom.save();
+        // Create array for location data
+        const locationTab = [location.lat, location.lng];
+        const newRoom = new Room({
+          title: title,
+          city: city,
+          country: country,
+          description: description,
+          price: price,
+          ratingValue: ratingValue,
+          reviews: reviews,
+          type: type,
+          mainInfos: {
+            guests: guests,
+            bedrooms: bedrooms,
+            beds: beds,
+            bathrooms: bathrooms,
+          },
 
-      const user = await User.findOne(req.user._id);
-      let tabRooms = user.rooms;
-      tabRooms.push(newRoom._id);
-      await User.findByIdAndUpdate(req.user._id, {
-        rooms: tabRooms,
-      });
-      res.status(200).json(success(newRoom));
-    } else {
-      res.status(400).json(err("Parameters missing"));
+          location: locationTab,
+          options: options,
+          owner: req.user._id,
+        });
+
+        if (!Array.isArray(req.files.pictures)) {
+          // On verifie si on envoit bien une image.
+          if (req.files.pictures.mimetype.slice(0, 5) !== "image") {
+            return res.status(400).json(err("You must send images"));
+          }
+          const result = await cloudinary.uploader.upload(
+            convertToBase64(req.files.pictures),
+            {
+              folder: `airbnb/${newRoom._id}`,
+            }
+          );
+
+          newRoom.picture = result;
+          newRoom.picturesArray.push(result);
+        } else {
+          for (let i = 0; i < req.files.pictures.length; i++) {
+            const picture = req.files.pictures[i];
+            if (picture.mimetype.slice(0, 5) !== "image") {
+              return res.status(400).json(err("You must send images"));
+            }
+            if (i === 0) {
+              const result = await cloudinary.uploader.upload(
+                convertToBase64(picture),
+                {
+                  folder: `airbnb/${newRoom._id}`,
+                }
+              );
+
+              newRoom.picture = result;
+              newRoom.picturesArray.push(result);
+            } else {
+              const result = await cloudinary.uploader.upload(
+                convertToBase64(picture),
+                {
+                  folder: `airbnb/${newRoom._id}`,
+                }
+              );
+              newRoom.picturesArray.push(result);
+            }
+          }
+        }
+
+        await newRoom.save();
+
+        const user = await User.findOne(req.user._id);
+        let tabRooms = user.rooms;
+        tabRooms.push(newRoom._id);
+        await User.findByIdAndUpdate(req.user._id, {
+          rooms: tabRooms,
+        });
+        res.status(200).json(success(newRoom));
+      } else {
+        res.status(400).json(err("Parameters missing"));
+      }
+    } catch (error) {
+      res.status(400).json(err(error.message));
     }
-  } catch (error) {
-    res.status(400).json(err(error.message));
   }
-});
+);
 
 // Get rooms
 router.get("/rooms", async (req, res) => {
@@ -213,7 +253,7 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
             newObj.beds = beds;
           }
           if (bathrooms) {
-            newObj.rooms = rooms;
+            newObj.bathrooms = bathrooms;
           }
           if (location) {
             newObj.location = [location.lat, location.lng];
