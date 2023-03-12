@@ -89,7 +89,6 @@ router.post(
         });
 
         if (!Array.isArray(req.files.pictures)) {
-          // On verifie si on envoit bien une image.
           if (req.files.pictures.mimetype.slice(0, 5) !== "image") {
             return res.status(400).json(err("You must send images"));
           }
