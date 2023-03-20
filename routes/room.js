@@ -28,7 +28,6 @@ router.post("/upload", fileUpload(), async (req, res) => {
   try {
     const imgConvert = convertToBase64(req.files.picture);
     const result = await cloudinary.uploader.upload(imgConvert);
-    console.log(result);
     res.json(success("UPLOAD OK"));
   } catch (error) {
     res.status(400).json(err(error.message));
@@ -45,10 +44,11 @@ router.post(
       console.log("req.files:", req.files);
       const {
         title,
-        description,
-        price,
         city,
         country,
+        address,
+        description,
+        price,
         ratingValue,
         reviews,
         type,
@@ -61,16 +61,13 @@ router.post(
       } = req.body;
 
       if (title) {
-        // const imgConvert = convertToBase64(req.files.pictures);
-        // const result = await cloudinary.uploader.upload(imgConvert);
-        // console.log(result);
-
-        // Create array for location data
         const locationTab = [location.lat, location.lng];
+
         const newRoom = new Room({
           title: title,
           city: city,
           country: country,
+          address: address,
           description: description,
           price: price,
           ratingValue: ratingValue,
@@ -191,6 +188,7 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
       price,
       city,
       country,
+      address,
       type,
       guests,
       bedrooms,
@@ -214,6 +212,7 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
           price ||
           city ||
           country ||
+          address ||
           type ||
           guests ||
           bedrooms ||
@@ -238,6 +237,9 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
           }
           if (country) {
             newObj.country = country;
+          }
+          if (address) {
+            newObj.address = address;
           }
           if (type) {
             newObj.type = type;
@@ -293,7 +295,6 @@ router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
         await Room.findByIdAndRemove(req.params.id);
 
         const user = await User.findById(userId);
-        // on recherche l'utilisateur en BDD
 
         let tab = user.rooms;
         let num = tab.indexOf(req.params.id);

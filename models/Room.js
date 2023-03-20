@@ -4,6 +4,7 @@ const Room = mongoose.model("Room", {
   title: String,
   city: String,
   country: String,
+  address: String,
   description: String,
   price: Number,
   ratingValue: Number,

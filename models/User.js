@@ -9,7 +9,7 @@ const User = mongoose.model("User", {
   account: {
     lastname: String,
     firstname: String,
-    picture: Object,
+    picture: { type: mongoose.Schema.Types.Mixed, default: {} },
   },
   rooms: [
     {
