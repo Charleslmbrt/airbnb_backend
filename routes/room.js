@@ -317,4 +317,37 @@ router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+// Rooms favoris
+router.post("/room/favoris/:id", isAuthenticated, async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.id);
+
+    if (room) {
+      const user = await User.findById(req.user._id);
+
+      if (user) {
+        let favoris = user.favoris;
+
+        if (favoris.includes(req.params.id)) {
+          res.status(400).json(err("Room already in favorites"));
+        } else {
+          favoris.push(req.params.id);
+
+          await User.findByIdAndUpdate(req.user._id, {
+            favoris: favoris,
+          });
+
+          res.json(success("Room added to favorites"));
+        }
+      } else {
+        res.status(400).json(err("User not found"));
+      }
+    } else {
+      res.status(400).json(err("Room not found"));
+    }
+  } catch (error) {
+    res.status(400).json(err(error.message));
+  }
+});
+
 module.exports = router;

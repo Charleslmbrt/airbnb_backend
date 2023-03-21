@@ -17,6 +17,12 @@ const User = mongoose.model("User", {
       ref: "Room",
     },
   ],
+  favoris: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Room",
+    },
+  ],
   token: String,
   salt: String,
   hash: String,
