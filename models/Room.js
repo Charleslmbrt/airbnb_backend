@@ -18,8 +18,7 @@ const Room = mongoose.model("Room", {
   },
   picture: { type: mongoose.Schema.Types.Mixed, default: {} },
   picturesArray: { type: Array, default: [] },
-  location: { type: [Number], default: [] },
-
+  location: { type: Array, default: [] },
   options: String,
   owner: {
     type: mongoose.Schema.Types.ObjectId,

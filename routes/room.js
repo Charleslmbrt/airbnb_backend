@@ -41,7 +41,6 @@ router.post(
   fileUpload(),
   async (req, res) => {
     try {
-      console.log("req.files:", req.files);
       const {
         title,
         city,
@@ -60,9 +59,28 @@ router.post(
         options,
       } = req.body;
 
-      if (title) {
-        const locationTab = [location.lat, location.lng];
+      const location_lat = req.body.location_lat;
+      const location_lng = req.body.location_lng;
 
+      console.log("kiki", location_lat);
+
+      const locationTab = {
+        lat: parseFloat(location_lat),
+        lng: parseFloat(location_lng),
+      };
+
+      if (title) {
+        // console.log("req.body:", req.body);
+        // console.log("location", location);
+        // console.log("lat", location.lat);
+        // const locationTab = [location.lat, location.lng];
+
+        // const locationTab = [
+        //   parseFloat(req.body.location_lat),
+        //   parseFloat(req.body.location_lng),
+        // ];
+
+        console.log("locationTab", locationTab);
         const newRoom = new Room({
           title: title,
           city: city,
@@ -79,7 +97,6 @@ router.post(
             beds: beds,
             bathrooms: bathrooms,
           },
-
           location: locationTab,
           options: options,
           owner: req.user._id,
