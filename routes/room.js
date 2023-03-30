@@ -24,15 +24,15 @@ const convertToBase64 = (file) => {
 };
 
 // Upload file
-router.post("/upload", fileUpload(), async (req, res) => {
-  try {
-    const imgConvert = convertToBase64(req.files.picture);
-    const result = await cloudinary.uploader.upload(imgConvert);
-    res.json(success("UPLOAD OK"));
-  } catch (error) {
-    res.status(400).json(err(error.message));
-  }
-});
+// router.post("/upload", fileUpload(), async (req, res) => {
+//   try {
+//     const imgConvert = convertToBase64(req.files.picture);
+//     const result = await cloudinary.uploader.upload(imgConvert);
+//     res.json(success("UPLOAD OK"));
+//   } catch (error) {
+//     res.status(400).json(err(error.message));
+//   }
+// });
 
 // Create room
 router.post(
@@ -55,14 +55,13 @@ router.post(
         bedrooms,
         beds,
         bathrooms,
-        location,
         options,
+        location_lat,
+        location_lng,
       } = req.body;
 
-      const location_lat = req.body.location_lat;
-      const location_lng = req.body.location_lng;
-
-      console.log("kiki", location_lat);
+      // const location_lat = req.body.location_lat;
+      // const location_lng = req.body.location_lng;
 
       const locationTab = {
         lat: parseFloat(location_lat),
@@ -70,16 +69,6 @@ router.post(
       };
 
       if (title) {
-        // console.log("req.body:", req.body);
-        // console.log("location", location);
-        // console.log("lat", location.lat);
-        // const locationTab = [location.lat, location.lng];
-
-        // const locationTab = [
-        //   parseFloat(req.body.location_lat),
-        //   parseFloat(req.body.location_lng),
-        // ];
-
         console.log("locationTab", locationTab);
         const newRoom = new Room({
           title: title,

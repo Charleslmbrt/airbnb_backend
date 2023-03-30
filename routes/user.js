@@ -4,11 +4,25 @@ const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
 const { success, err } = require("../status");
 const router = express.Router();
+const fileUpload = require("express-fileupload");
+const cloudinary = require("cloudinary").v2;
+
+// account Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME_CLOUDINARY,
+  api_key: process.env.API_KEY_CLOUDINARY,
+  api_secret: process.env.API_SECRET_CLOUDINARY,
+});
+
+// Convert buffer as base64 format
+const convertToBase64 = (file) => {
+  return `data:${file.mimetype};base64,${file.data.toString("base64")}`;
+};
 
 // import models
 const User = require("../models/User");
 
-router.post("/user/signup", async (req, res) => {
+router.post("/user/signup", fileUpload(), async (req, res) => {
   try {
     const { email, lastname, firstname, password } = req.body;
     const user = await User.findOne({ email: email });
@@ -34,6 +48,18 @@ router.post("/user/signup", async (req, res) => {
           access: access,
         });
 
+        if (req.files.picture.mimetype.slice(0, 5) !== "image") {
+          return res.status(400).json(err("You must send image"));
+        }
+        const result = await cloudinary.uploader.upload(
+          convertToBase64(req.files.picture),
+          {
+            folder: `airbnb/avatar/${newUser._id}`,
+          }
+        );
+
+        newUser.account.picture = result;
+
         await newUser.save();
 
         res.json(
@@ -43,6 +69,7 @@ router.post("/user/signup", async (req, res) => {
             lastname: newUser.account.lastname,
             firstname: newUser.account.firstname,
             token: newUser.token,
+            picture: newUser.account.picture,
           })
         );
       } else {
