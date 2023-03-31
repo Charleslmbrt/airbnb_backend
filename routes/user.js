@@ -22,6 +22,9 @@ const convertToBase64 = (file) => {
 // import models
 const User = require("../models/User");
 
+// import middlewares
+const isAuthenticated = require("../middlewares/isAuthenticated");
+
 router.post("/user/signup", fileUpload(), async (req, res) => {
   try {
     const { email, lastname, firstname, password } = req.body;
@@ -68,8 +71,8 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
             email: newUser.email,
             lastname: newUser.account.lastname,
             firstname: newUser.account.firstname,
-            token: newUser.token,
             picture: newUser.account.picture,
+            token: newUser.token,
           })
         );
       } else {
@@ -97,6 +100,7 @@ router.post("/user/login", async (req, res) => {
               email: user.email,
               lastname: user.account.lastname,
               firstname: user.account.firstname,
+              picture: user.account.picture,
               token: user.token,
             })
           );
@@ -108,6 +112,36 @@ router.post("/user/login", async (req, res) => {
       }
     } else {
       res.status(400).json(err("All fields are required"));
+    }
+  } catch (error) {
+    res.status(400).json(err(error.message));
+  }
+});
+
+// Get one user
+router.get("/users/:id", isAuthenticated, async (req, res) => {
+  try {
+    if (req.params.id) {
+      const user = await User.findById(req.params.id);
+      console.log("user", user);
+
+      if (user) {
+        res.status(200).json(
+          success({
+            _id: user._id,
+            email: user.email,
+            lastname: user.account.lastname,
+            firstname: user.account.firstname,
+            picture: user.account.picture,
+            rooms: user.rooms,
+            favoris: user.favoris,
+          })
+        );
+      } else {
+        res.status(400).json(err("User not found"));
+      }
+    } else {
+      res.status(400).json(err("Missing id"));
     }
   } catch (error) {
     res.status(400).json(err(error.message));
