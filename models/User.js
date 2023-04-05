@@ -17,7 +17,7 @@ const User = mongoose.model("User", {
       ref: "Room",
     },
   ],
-  favoris: [
+  favorites: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Room",

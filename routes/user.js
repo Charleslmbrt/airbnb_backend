@@ -119,7 +119,7 @@ router.post("/user/login", async (req, res) => {
 });
 
 // Get one user
-router.get("/users/:id", isAuthenticated, async (req, res) => {
+router.get("/user/:id", isAuthenticated, async (req, res) => {
   try {
     if (req.params.id) {
       const user = await User.findById(req.params.id);
@@ -144,7 +144,7 @@ router.get("/users/:id", isAuthenticated, async (req, res) => {
       res.status(400).json(err("Missing id"));
     }
   } catch (error) {
-    res.status(400).json(err(error.message));
+    res.status(400).json(err({ blabla: error.message }));
   }
 });
 

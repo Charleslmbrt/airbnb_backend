@@ -323,8 +323,8 @@ router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// Rooms favoris
-router.post("/room/favoris/:id", isAuthenticated, async (req, res) => {
+// Rooms favorites
+router.post("/rooms/favorites/:id", isAuthenticated, async (req, res) => {
   try {
     const room = await Room.findById(req.params.id);
 
@@ -332,15 +332,15 @@ router.post("/room/favoris/:id", isAuthenticated, async (req, res) => {
       const user = await User.findById(req.user._id);
 
       if (user) {
-        let favoris = user.favoris;
+        let favoritesTab = user.favorites;
 
-        if (favoris.includes(req.params.id)) {
+        if (favoritesTab.includes(room._id)) {
           res.status(400).json(err("Room already in favorites"));
         } else {
-          favoris.push(req.params.id);
+          favoritesTab.push(room._id);
 
           await User.findByIdAndUpdate(req.user._id, {
-            favoris: favoris,
+            favorites: favoritesTab,
           });
 
           res.json(success("Room added to favorites"));
