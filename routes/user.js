@@ -134,7 +134,7 @@ router.get("/user/:id", isAuthenticated, async (req, res) => {
             firstname: user.account.firstname,
             picture: user.account.picture,
             rooms: user.rooms,
-            favoris: user.favoris,
+            favorites: user.favorites,
           })
         );
       } else {
