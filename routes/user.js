@@ -21,6 +21,7 @@ const convertToBase64 = (file) => {
 
 // import models
 const User = require("../models/User");
+const Room = require("../models/Room");
 
 // import middlewares
 const isAuthenticated = require("../middlewares/isAuthenticated");
@@ -144,7 +145,23 @@ router.get("/user/:id", isAuthenticated, async (req, res) => {
       res.status(400).json(err("Missing id"));
     }
   } catch (error) {
-    res.status(400).json(err({ blabla: error.message }));
+    res.status(400).json(err(error.message));
+  }
+});
+
+// Get infos of user's favorites rooms
+router.get("/user/:userId/favorites", isAuthenticated, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+
+    if (user) {
+      const favoritesRooms = await Room.find({ _id: { $in: user.favorites } });
+      return res.status(200).json(success(favoritesRooms));
+    }
+  } catch (error) {
+    res.status(400).json(err(error.message));
   }
 });
 
