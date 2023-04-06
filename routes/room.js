@@ -323,7 +323,7 @@ router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// Rooms favorites
+// Create room favorite
 router.post("/rooms/favorites/:id", isAuthenticated, async (req, res) => {
   try {
     const room = await Room.findById(req.params.id);
@@ -355,5 +355,42 @@ router.post("/rooms/favorites/:id", isAuthenticated, async (req, res) => {
     res.status(400).json(err(error.message));
   }
 });
+
+// Delete one favorite room
+router.delete(
+  "/rooms/favorites/delete/:id",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const room = await Room.findById(req.params.id);
+
+      if (room) {
+        const user = await User.findById(req.user._id);
+
+        if (user) {
+          let favoritesTab = user.favorites;
+
+          if (favoritesTab.includes(room._id)) {
+            favoritesTab.splice(favoritesTab.indexOf(room._id), 1);
+
+            await User.findByIdAndUpdate(req.user._id, {
+              favorites: favoritesTab,
+            });
+
+            res.json(success("Room removed from favorites"));
+          } else {
+            res.status(400).json(err("Room not in favorites"));
+          }
+        } else {
+          res.status(400).json(err("User not found"));
+        }
+      } else {
+        res.status(400).json(err("Room not found"));
+      }
+    } catch (error) {
+      res.status(400).json(err(error.message));
+    }
+  }
+);
 
 module.exports = router;
