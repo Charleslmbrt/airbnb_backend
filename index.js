@@ -14,7 +14,7 @@ app.use(cors());
 
 mongoose
   .set("strictQuery", false)
-  .connect("mongodb://localhost/airbnb", { useNewUrlParser: true })
+  .connect("mongodb://0.0.0.0:27017/airbnb", { useNewUrlParser: true })
   .then(() => {
     console.log("Connected to the DB!");
   });
@@ -29,7 +29,7 @@ app.all("*", (req, res) => {
   res.status(404).json(err("This route doesn't exist"));
 });
 
-const defaultPort = 3000;
+const defaultPort = 8080;
 const PORT = process.env.PORT;
 
 app.listen(PORT || defaultPort, () => {

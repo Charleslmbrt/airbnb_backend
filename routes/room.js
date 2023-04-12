@@ -164,7 +164,7 @@ router.get("/rooms", async (req, res) => {
 });
 
 // Get one room
-router.get("/room/:id", async (req, res) => {
+router.get("/rooms/:id", async (req, res) => {
   if (req.params.id) {
     try {
       const room = await Room.findById(req.params.id).populate({
@@ -323,7 +323,7 @@ router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// Create room favorite
+// Create favorite room
 router.post("/rooms/favorites/:id", isAuthenticated, async (req, res) => {
   try {
     const room = await Room.findById(req.params.id);
@@ -356,7 +356,7 @@ router.post("/rooms/favorites/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// Delete one favorite room
+// Delete favorite room
 router.delete(
   "/rooms/favorites/delete/:id",
   isAuthenticated,
