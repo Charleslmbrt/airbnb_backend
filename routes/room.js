@@ -23,17 +23,6 @@ const convertToBase64 = (file) => {
   return `data:${file.mimetype};base64,${file.data.toString("base64")}`;
 };
 
-// Upload file
-// router.post("/upload", fileUpload(), async (req, res) => {
-//   try {
-//     const imgConvert = convertToBase64(req.files.picture);
-//     const result = await cloudinary.uploader.upload(imgConvert);
-//     res.json(success("UPLOAD OK"));
-//   } catch (error) {
-//     res.status(400).json(err(error.message));
-//   }
-// });
-
 // Create room
 router.post(
   "/room/publish",
@@ -153,10 +142,50 @@ router.post(
 // Get rooms
 router.get("/rooms", async (req, res) => {
   try {
-    const rooms = await Room.find({}).populate({
-      path: "owner",
+    const createFilters = (req) => {
+      const filters = {};
+
+      if (req.query.title) {
+        filters.title = new RegExp(req.query.title, "i");
+      }
+
+      if (req.query.priceMin) {
+        filters.price = {};
+        filters.price.$gte = req.query.priceMin;
+      }
+
+      if (req.query.priceMax) {
+        if (filters.price) {
+          filters.price.$lte = req.query.priceMax;
+        } else {
+          filters.price = {};
+          filters.price.$lte = req.query.priceMax;
+        }
+      }
+      return filters;
+    };
+
+    const filters = createFilters(req);
+
+    const search = Room.find(filters, { description: false }).populate({
+      path: "user",
       select: "account",
     });
+
+    if (req.query.sort === "price-asc") {
+      search.sort({ price: 1 });
+    } else if (req.query.sort === "price-desc") {
+      search.sort({ price: -1 });
+    }
+
+    if (req.query.page) {
+      const page = Number(req.query.page);
+      const limit = Number(req.query.limit);
+      search.limit(limit).skip(limit * (page - 1));
+    }
+
+    const rooms = await search;
+
     res.json(success(rooms));
   } catch (error) {
     res.status(400).json(err(error.message));
