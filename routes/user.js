@@ -124,7 +124,6 @@ router.get("/user/:id", isAuthenticated, async (req, res) => {
   try {
     if (req.params.id) {
       const user = await User.findById(req.params.id);
-      console.log("user", user);
 
       if (user) {
         res.status(200).json(

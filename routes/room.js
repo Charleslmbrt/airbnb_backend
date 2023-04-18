@@ -69,7 +69,7 @@ router.post(
       };
 
       if (title) {
-        console.log("locationTab", locationTab);
+        // console.log("locationTab", locationTab);
         const newRoom = new Room({
           title: title,
           city: city,
