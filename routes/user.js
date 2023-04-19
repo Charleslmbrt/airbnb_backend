@@ -2,7 +2,7 @@ const express = require("express");
 const uid2 = require("uid2");
 const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
-const { success, err } = require("../status");
+// const { success, err } = require("../status");
 const router = express.Router();
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
@@ -32,7 +32,7 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
     const user = await User.findOne({ email: email });
 
     if (user) {
-      res.status(409).json(err("This email has already an account"));
+      res.status(409).json("This email has already an account");
     } else {
       if (email && lastname && firstname && password) {
         const token = uid2(120);
@@ -53,7 +53,7 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
         });
 
         if (req.files.picture.mimetype.slice(0, 5) !== "image") {
-          return res.status(400).json(err("You must send image"));
+          return res.status(400).json("You must send image");
         }
         const result = await cloudinary.uploader.upload(
           convertToBase64(req.files.picture),
@@ -66,22 +66,20 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
 
         await newUser.save();
 
-        res.json(
-          success({
-            _id: newUser._id,
-            email: newUser.email,
-            lastname: newUser.account.lastname,
-            firstname: newUser.account.firstname,
-            picture: newUser.account.picture,
-            token: newUser.token,
-          })
-        );
+        res.json({
+          _id: newUser._id,
+          email: newUser.email,
+          lastname: newUser.account.lastname,
+          firstname: newUser.account.firstname,
+          picture: newUser.account.picture,
+          token: newUser.token,
+        });
       } else {
-        res.status(400).json(err("All fields are required"));
+        res.status(400).json("All fields are required");
       }
     }
   } catch (error) {
-    res.status(400).json(err(error.message));
+    res.status(400).json(error.message);
   }
 });
 
@@ -95,27 +93,25 @@ router.post("/user/login", async (req, res) => {
       if (user) {
         const checkPassword = SHA256(password + user.salt).toString(encBase64);
         if (checkPassword === user.hash) {
-          res.status(200).json(
-            success({
-              _id: user._id,
-              email: user.email,
-              lastname: user.account.lastname,
-              firstname: user.account.firstname,
-              picture: user.account.picture,
-              token: user.token,
-            })
-          );
+          res.status(200).json({
+            _id: user._id,
+            email: user.email,
+            lastname: user.account.lastname,
+            firstname: user.account.firstname,
+            picture: user.account.picture,
+            token: user.token,
+          });
         } else {
-          res.status(401).json(err("Unauthorized"));
+          res.status(401).json("Unauthorized");
         }
       } else {
-        res.status(400).json(err("User not found"));
+        res.status(400).json("User not found");
       }
     } else {
-      res.status(400).json(err("All fields are required"));
+      res.status(400).json("All fields are required");
     }
   } catch (error) {
-    res.status(400).json(err(error.message));
+    res.status(400).json(error.message);
   }
 });
 
@@ -126,25 +122,23 @@ router.get("/user/:id", isAuthenticated, async (req, res) => {
       const user = await User.findById(req.params.id);
 
       if (user) {
-        res.status(200).json(
-          success({
-            _id: user._id,
-            email: user.email,
-            lastname: user.account.lastname,
-            firstname: user.account.firstname,
-            picture: user.account.picture,
-            rooms: user.rooms,
-            favorites: user.favorites,
-          })
-        );
+        res.status(200).json({
+          _id: user._id,
+          email: user.email,
+          lastname: user.account.lastname,
+          firstname: user.account.firstname,
+          picture: user.account.picture,
+          rooms: user.rooms,
+          favorites: user.favorites,
+        });
       } else {
-        res.status(400).json(err("User not found"));
+        res.status(400).json("User not found");
       }
     } else {
-      res.status(400).json(err("Missing id"));
+      res.status(400).json("Missing id");
     }
   } catch (error) {
-    res.status(400).json(err(error.message));
+    res.status(400).json(error.message);
   }
 });
 
@@ -157,10 +151,10 @@ router.get("/user/:userId/favorites", isAuthenticated, async (req, res) => {
 
     if (user) {
       const favoritesRooms = await Room.find({ _id: { $in: user.favorites } });
-      return res.status(200).json(success(favoritesRooms));
+      return res.status(200).json(favoritesRooms);
     }
   } catch (error) {
-    res.status(400).json(err(error.message));
+    res.status(400).json(error.message);
   }
 });
 

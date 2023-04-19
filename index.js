@@ -26,7 +26,7 @@ const roomRoutes = require("./routes/room");
 app.use(roomRoutes);
 
 app.all("*", (req, res) => {
-  res.status(404).json(err("This route doesn't exist"));
+  res.status(404).json("This route doesn't exist");
 });
 
 const defaultPort = 8080;

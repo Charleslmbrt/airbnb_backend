@@ -1,5 +1,5 @@
 const express = require("express");
-const { success, err } = require("../status");
+// const { success, err } = require("../status");
 const router = express.Router();
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
@@ -82,7 +82,7 @@ router.post(
 
         if (!Array.isArray(req.files.pictures)) {
           if (req.files.pictures.mimetype.slice(0, 5) !== "image") {
-            return res.status(400).json(err("You must send images"));
+            return res.status(400).json("You must send images");
           }
           const result = await cloudinary.uploader.upload(
             convertToBase64(req.files.pictures),
@@ -97,7 +97,7 @@ router.post(
           for (let i = 0; i < req.files.pictures.length; i++) {
             const picture = req.files.pictures[i];
             if (picture.mimetype.slice(0, 5) !== "image") {
-              return res.status(400).json(err("You must send images"));
+              return res.status(400).json("You must send images");
             }
             if (i === 0) {
               const result = await cloudinary.uploader.upload(
@@ -129,12 +129,12 @@ router.post(
         await User.findByIdAndUpdate(req.user._id, {
           rooms: tabRooms,
         });
-        res.status(200).json(success(newRoom));
+        res.status(200).json(newRoom);
       } else {
-        res.status(400).json(err("Parameters missing"));
+        res.status(400).json("Parameters missing");
       }
     } catch (error) {
-      res.status(400).json(err(error.message));
+      res.status(400).json(error.message);
     }
   }
 );
@@ -171,10 +171,10 @@ router.get("/rooms", async (req, res) => {
     // Si on reçoit un query sort === "price-desc"
     if (req.query.sort === "price-desc") {
       // On réassigne cette valeur à sort
-      sort = { product_price: -1 };
+      sort = { price: -1 };
     } else if (req.query.sort === "price-asc") {
       // Si la valeur du query est "price-asc" on réassigne cette autre valeur
-      sort = { product_price: 1 };
+      sort = { price: 1 };
     }
     // Création de la variable page qui vaut, pour l'instant, undefined
     let page;
@@ -203,10 +203,10 @@ router.get("/rooms", async (req, res) => {
 
     res.json({
       count: count,
-      offers: rooms,
+      rooms: rooms,
     });
   } catch (error) {
-    res.status(400).json(err(error.message));
+    res.status(400).json(error.message);
   }
 });
 
@@ -220,15 +220,15 @@ router.get("/rooms/:id", async (req, res) => {
       });
 
       if (room) {
-        res.json(success(room));
+        res.json(room);
       } else {
-        res.status(400).json(err("Room not found"));
+        res.status(400).json("Room not found");
       }
     } catch (error) {
-      res.status(400).json(err(error.message));
+      res.status(400).json(error.message);
     }
   } else {
-    res.status(400).json(err("Missing room id"));
+    res.status(400).json("Missing room id");
   }
 });
 
@@ -322,16 +322,16 @@ router.put("/room/update/:id", isAuthenticated, async (req, res) => {
 
           res.json(success(roomUpdated));
         } else {
-          res.status(400).json(err("Missing parameters"));
+          res.status(400).json("Missing parameters");
         }
       } else {
-        res.status(401).json(err("Unauthorized"));
+        res.status(401).json("Unauthorized");
       }
     } else {
-      res.status(400).json(err("Room not found"));
+      res.status(400).json("Room not found");
     }
   } catch (error) {
-    res.status(400).json(err(error.message));
+    res.status(400).json(error.message);
   }
 });
 
@@ -358,15 +358,15 @@ router.delete("/room/delete/:id", isAuthenticated, async (req, res) => {
         });
         // on modifie "rooms" en BDD : l'annonce supprimée n'apparaitra plus dans le tableau des annonces de l'utilisateur
 
-        res.status(200).json(success("Room deleted"));
+        res.status(200).json("Room deleted");
       } else {
-        res.status(400).json(err("Unauthorized"));
+        res.status(400).json("Unauthorized");
       }
     } else {
-      res.status(400).json(err("Room not found"));
+      res.status(400).json("Room not found");
     }
   } catch (error) {
-    res.status(400).json(err(error.message));
+    res.status(400).json(error.message);
   }
 });
 
@@ -382,7 +382,7 @@ router.post("/rooms/favorites/:id", isAuthenticated, async (req, res) => {
         let favoritesTab = user.favorites;
 
         if (favoritesTab.includes(room._id)) {
-          res.status(400).json(err("Room already in favorites"));
+          res.status(400).json("Room already in favorites");
         } else {
           favoritesTab.push(room._id);
 
@@ -390,16 +390,16 @@ router.post("/rooms/favorites/:id", isAuthenticated, async (req, res) => {
             favorites: favoritesTab,
           });
 
-          res.json(success("Room added to favorites"));
+          res.json("Room added to favorites");
         }
       } else {
-        res.status(400).json(err("User not found"));
+        res.status(400).json("User not found");
       }
     } else {
-      res.status(400).json(err("Room not found"));
+      res.status(400).json("Room not found");
     }
   } catch (error) {
-    res.status(400).json(err(error.message));
+    res.status(400).json(error.message);
   }
 });
 
@@ -424,18 +424,18 @@ router.delete(
               favorites: favoritesTab,
             });
 
-            res.json(success("Room removed from favorites"));
+            res.json("Room removed from favorites");
           } else {
-            res.status(400).json(err("Room not in favorites"));
+            res.status(400).json("Room not in favorites");
           }
         } else {
-          res.status(400).json(err("User not found"));
+          res.status(400).json("User not found");
         }
       } else {
-        res.status(400).json(err("Room not found"));
+        res.status(400).json("Room not found");
       }
     } catch (error) {
-      res.status(400).json(err(error.message));
+      res.status(400).json(error.message);
     }
   }
 );
