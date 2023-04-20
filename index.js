@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const { success, err } = require("./status");
 const morgan = require("morgan");
 require("dotenv").config();
 const cors = require("cors");
