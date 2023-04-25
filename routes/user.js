@@ -2,7 +2,6 @@ const express = require("express");
 const uid2 = require("uid2");
 const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
-// const { success, err } = require("../status");
 const router = express.Router();
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
@@ -13,6 +12,8 @@ cloudinary.config({
   api_key: process.env.API_KEY_CLOUDINARY,
   api_secret: process.env.API_SECRET_CLOUDINARY,
 });
+
+console.log("sfhskjh", process.env.CLOUD_NAME_CLOUDINARY);
 
 // Convert buffer as base64 format
 const convertToBase64 = (file) => {
@@ -30,6 +31,8 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
   try {
     const { email, lastname, firstname, password } = req.body;
     const user = await User.findOne({ email: email });
+
+    console.log(req.files);
 
     if (user) {
       res.status(409).json("This email has already an account");
