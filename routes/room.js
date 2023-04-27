@@ -77,8 +77,10 @@ router.post(
           },
           location: locationTab,
           options: options,
-          owner: req.user._id,
+          owner: req.user,
         });
+
+        // console.log("req.user", req.user);
 
         if (!Array.isArray(req.files.pictures)) {
           if (req.files.pictures.mimetype.slice(0, 5) !== "image") {
@@ -192,7 +194,7 @@ router.get("/rooms", async (req, res) => {
     const rooms = await Room.find(filters)
       .populate({
         path: "owner",
-        select: "account",
+        select: "account.lastname account.firstname account.picture",
       })
       .sort(sort)
       .skip((page - 1) * limit) // ignorer les x résultats
@@ -216,10 +218,11 @@ router.get("/rooms/:id", async (req, res) => {
     try {
       const room = await Room.findById(req.params.id).populate({
         path: "owner",
-        select: "account",
+        select: "account.picture account.lastname account.firstname",
       });
 
       if (room) {
+        console.log(room);
         res.json(room);
       } else {
         res.status(400).json("Room not found");

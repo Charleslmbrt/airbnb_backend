@@ -13,8 +13,6 @@ cloudinary.config({
   api_secret: process.env.API_SECRET_CLOUDINARY,
 });
 
-console.log("sfhskjh", process.env.CLOUD_NAME_CLOUDINARY);
-
 // Convert buffer as base64 format
 const convertToBase64 = (file) => {
   return `data:${file.mimetype};base64,${file.data.toString("base64")}`;
@@ -156,6 +154,29 @@ router.get("/user/:userId/favorites", isAuthenticated, async (req, res) => {
       const favoritesRooms = await Room.find({ _id: { $in: user.favorites } });
       return res.status(200).json(favoritesRooms);
     }
+  } catch (error) {
+    res.status(400).json(error.message);
+  }
+});
+
+// update user and copy picture of an another user
+router.put("/user/update/:id", isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    const userPicture = user.account.picture;
+
+    const targetUser = await User.findOne({ _id: req.body.userId });
+
+    const userUpdated = await User.findOneAndUpdate(
+      {
+        _id: targetUser,
+      },
+      { $set: { "account.picture": userPicture } },
+      { new: true }
+    );
+
+    res.json(userUpdated);
   } catch (error) {
     res.status(400).json(error.message);
   }
