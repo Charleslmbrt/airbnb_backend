@@ -13,7 +13,7 @@ app.use(cors());
 
 mongoose
   .set("strictQuery", false)
-  .connect("mongodb://0.0.0.0:27017/airbnb", { useNewUrlParser: true })
+  .connect(process.env.MONGODB_URI, { useNewUrlParser: true })
   .then(() => {
     console.log("Connected to the DB!");
   });
