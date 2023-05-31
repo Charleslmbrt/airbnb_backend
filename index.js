@@ -29,10 +29,8 @@ app.get("/", async (req, res) => {
     const googleMapsAPIKey = process.env.GOOGLE_MAPS_API_KEY;
     const googleMapsAPIURL = `https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places&callback=Function.prototype`;
 
-    // Effectuer l'appel à l'API Google Maps depuis le serveur
     const response = await axios.get(googleMapsAPIURL);
 
-    // Renvoyer la réponse à la page HTML
     res.send(response.data);
   } catch (error) {
     console.error(error);
