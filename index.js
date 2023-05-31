@@ -24,6 +24,22 @@ app.use(userRoutes);
 const roomRoutes = require("./routes/room");
 app.use(roomRoutes);
 
+app.get("/", async (req, res) => {
+  try {
+    const googleMapsAPIKey = process.env.GOOGLE_MAPS_API_KEY;
+    const googleMapsAPIURL = `https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places&callback=Function.prototype`;
+
+    // Effectuer l'appel à l'API Google Maps depuis le serveur
+    const response = await axios.get(googleMapsAPIURL);
+
+    // Renvoyer la réponse à la page HTML
+    res.send(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erreur lors de l'appel à l'API Google Maps");
+  }
+});
+
 app.all("*", (req, res) => {
   res.status(404).json("This route doesn't exist");
 });
