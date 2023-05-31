@@ -4,6 +4,7 @@ const morgan = require("morgan");
 require("dotenv").config();
 const cors = require("cors");
 const mongoose = require("mongoose");
+const axios = require("axios");
 
 // middlewares
 app.use(express.json());
