@@ -24,7 +24,7 @@ app.use(userRoutes);
 const roomRoutes = require("./routes/room");
 app.use(roomRoutes);
 
-app.get("/", async (req, res) => {
+app.get("/api/google-maps", async (req, res) => {
   try {
     const googleMapsAPIKey = process.env.GOOGLE_MAPS_API_KEY;
     const googleMapsAPIURL = `https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places&callback=Function.prototype`;
